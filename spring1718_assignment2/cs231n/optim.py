@@ -37,10 +37,8 @@ def sgd(w, dw, config=None):
     config format:
     - learning_rate: Scalar learning rate.
     """
-    if config is None:
-        config = {}
-
-    config.setdefault('learning_rate', 1e-4)
+    if config is None: config = {}
+    config.setdefault('learning_rate', 1e-2)
 
     w -= config['learning_rate'] * dw
     return w, config
@@ -57,9 +55,7 @@ def sgd_momentum(w, dw, config=None):
     - velocity: A numpy array of the same shape as w and dw used to store a
       moving average of the gradients.
     """
-    if config is None: 
-        config = {}
-
+    if config is None: config = {}
     config.setdefault('learning_rate', 1e-2)
     config.setdefault('momentum', 0.9)
     v = config.get('velocity', np.zeros_like(w))
@@ -69,11 +65,7 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    # 2018/12/12
-    v = config['momentum'] * v - config['learning_rate'] * dw # integrate velocity
-    next_w = w + v
-
-
+    pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -95,8 +87,7 @@ def rmsprop(w, dw, config=None):
     - epsilon: Small scalar used for smoothing to avoid dividing by zero.
     - cache: Moving average of second moments of gradients.
     """
-    if config is None:
-        config = {}
+    if config is None: config = {}
     config.setdefault('learning_rate', 1e-2)
     config.setdefault('decay_rate', 0.99)
     config.setdefault('epsilon', 1e-8)
@@ -108,8 +99,7 @@ def rmsprop(w, dw, config=None):
     # in the next_w variable. Don't forget to update cache value stored in    #
     # config['cache'].                                                        #
     ###########################################################################
-    config['cache'] = config['decay_rate'] * config['cache'] + (1 - config['decay_rate']) * dw**2
-    next_w = w - config['learning_rate'] * dw / (np.sqrt(config['cache']) + config['epsilon'])
+    pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -149,29 +139,7 @@ def adam(w, dw, config=None):
     # NOTE: In order to match the reference output, please modify t _before_  #
     # using it in any calculations.                                           #
     ###########################################################################
-    '''
-    m = beta1*m + (1-beta1)*dx
-    mt = m / (1-beta1**t)
-    v = beta2*v + (1-beta2)*(dx**2)
-    vt = v / (1-beta2**t)
-    x += - learning_rate * mt / (np.sqrt(vt) + eps)
-    '''
-    m = config['m']
-    v= config['v']
-    t = config['t']
-    learning_rate = config['learning_rate']
-    beta1 = config['beta1']
-    beta2 = config['beta2']
-    eps = config['epsilon']
-
-
-    m = beta1*m + (1-beta1)*dw
-    mt = m / (1-beta1**t)
-    v = beta2*v + (1-beta2)*(dw**2)
-    vt = v / (1-beta2**t)
-    w += - learning_rate * mt / (np.sqrt(vt) + eps)
-
-    next_w = w
+    pass
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################

@@ -1,7 +1,7 @@
 from builtins import range
 import numpy as np
 
-# 2018/12/14
+
 def affine_forward(x, w, b):
     """
     Computes the forward pass for an affine (fully-connected) layer.
@@ -14,7 +14,7 @@ def affine_forward(x, w, b):
     Inputs:
     - x: A numpy array containing input data, of shape (N, d_1, ..., d_k)
     - w: A numpy array of weights, of shape (D, M)
-    - b: A numpy are    ray of biases, of shape (M,)
+    - b: A numpy array of biases, of shape (M,)
 
     Returns a tuple of:
     - out: output, of shape (N, M)
@@ -26,10 +26,7 @@ def affine_forward(x, w, b):
     # TODO: Implement the affine forward pass. Store the result in out. You   #
     # will need to reshape the input into rows.                               #
     ###########################################################################
-    
-    out = np.matmul(x.reshape((N,-1)),w) + b
-
-
+    out = np.matmul(x.reshape((N,-1)),w) +b
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -59,11 +56,9 @@ def affine_backward(dout, cache):
     ###########################################################################
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
-
-
-    dx = np.reshape(np.matmul(dout,w.T),x.shape) # (N,M)*(M,H) => (N,d, ... , d_k)
-    dw = np.matmul(x.reshape((N,-1)).T,dout) # (D,N)*(N,M)
-    db = np.matmul(np.ones((1,N)),dout).reshape(b.shape) # (1,N)*(N,M)
+    dx = np.reshape(np.matmul(dout,w.T),x.shape)
+    dw = np.matmul(x.reshape((N,-1)).T,dout)
+    db = np.matmul(np.ones((1,N)),dout).reshape(b.shape)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -108,9 +103,7 @@ def relu_backward(dout, cache):
     ###########################################################################
     # TODO: Implement the ReLU backward pass.                                 #
     ###########################################################################
-    pass
-
-    dx = np.where(x>0, dout, 0)
+    dx = np.where(x>0,dout,0)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -692,7 +685,7 @@ def svm_loss(x, y):
     """
     N = x.shape[0]
     correct_class_scores = x[np.arange(N), y]
-    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0) #delta = 1.0
+    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0)
     margins[np.arange(N), y] = 0
     loss = np.sum(margins) / N
     num_pos = np.sum(margins > 0, axis=1)
@@ -717,10 +710,10 @@ def softmax_loss(x, y):
     - loss: Scalar giving the loss
     - dx: Gradient of the loss with respect to x
     """
-    shifted_logits = x - np.max(x, axis=1, keepdims=True) # since exp can be exploded, shift x.
-    Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True) #(N,1)
-    log_probs = shifted_logits - np.log(Z) # (N,C)
-    probs = np.exp(log_probs) #(N,C)
+    shifted_logits = x - np.max(x, axis=1, keepdims=True)
+    Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
+    log_probs = shifted_logits - np.log(Z)
+    probs = np.exp(log_probs)
     N = x.shape[0]
     loss = -np.sum(log_probs[np.arange(N), y]) / N
     dx = probs.copy()
