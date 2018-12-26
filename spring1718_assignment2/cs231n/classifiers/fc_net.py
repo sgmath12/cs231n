@@ -11,10 +11,13 @@ class TwoLayerNet(object):
     A two-layer fully-connected neural network with ReLU nonlinearity and
     softmax loss that uses a modular layer design. We assume an input dimension
     of D, a hidden dimension of H, and perform classification over C classes.
+
     The architecure should be affine - relu - affine - softmax.
+
     Note that this class does not implement gradient descent; instead, it
     will interact with a separate Solver object that is responsible for running
     optimization.
+
     The learnable parameters of the model are stored in the dictionary
     self.params that maps parameter names to numpy arrays.
     """
@@ -23,6 +26,7 @@ class TwoLayerNet(object):
                  weight_scale=1e-3, reg=0.0):
         """
         Initialize a new network.
+
         Inputs:
         - input_dim: An integer giving the size of the input
         - hidden_dim: An integer giving the size of the hidden layer
@@ -43,7 +47,10 @@ class TwoLayerNet(object):
         # and biases using the keys 'W1' and 'b1' and second layer                 #
         # weights and biases using the keys 'W2' and 'b2'.                         #
         ############################################################################
-        
+        self.params['W1'] = np.random.normal(0,weight_scale,(input_dim,hidden_dim))
+        self.params['b1'] = np.zeros(hidden_dim)
+        self.params['W2'] = np.random.normal(0,weight_scale,(hidden_dim,num_classes))
+        self.params['b2'] = np.zeros(num_classes)
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -52,13 +59,16 @@ class TwoLayerNet(object):
     def loss(self, X, y=None):
         """
         Compute loss and gradient for a minibatch of data.
+
         Inputs:
         - X: Array of input data of shape (N, d_1, ..., d_k)
         - y: Array of labels, of shape (N,). y[i] gives the label for X[i].
+
         Returns:
         If y is None, then run a test-time forward pass of the model and return:
         - scores: Array of shape (N, C) giving classification scores, where
           scores[i, c] is the classification score for X[i] and class c.
+
         If y is not None, then run a training-time forward and backward pass and
         return a tuple of:
         - loss: Scalar value giving the loss
@@ -70,7 +80,12 @@ class TwoLayerNet(object):
         # TODO: Implement the forward pass for the two-layer net, computing the    #
         # class scores for X and storing them in the scores variable.              #
         ############################################################################
-        pass
+        z1,cache_1 = affine_relu_forward(X, self.params['W1'], self.params['b1'])
+        z2,cache_2 = affine_relu_forward(z1,self.params['W2'], self.params['b2'])
+    
+        scores = z2
+
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -80,6 +95,7 @@ class TwoLayerNet(object):
             return scores
 
         loss, grads = 0, {}
+        reg = self.reg
         ############################################################################
         # TODO: Implement the backward pass for the two-layer net. Store the loss  #
         # in the loss variable and gradients in the grads dictionary. Compute data #
@@ -90,7 +106,16 @@ class TwoLayerNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
-        pass
+        loss,dscores = softmax_loss(scores,y)
+        loss += 0.5*(self.reg)*(np.sum(self.params['W1']*self.params['W1']) + np.sum(self.params['W2']*self.params['W2']))
+
+        dz1,grads['W2'],grads['b2'] = affine_relu_backward(dscores,cache_2)
+        dx,grads['W1'],grads['b1'] = affine_relu_backward(dz1,cache_1)
+
+
+        grads['W1'] += self.reg*self.params['W1']
+        grads['W2'] += self.reg*self.params['W2']
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -104,9 +129,12 @@ class FullyConnectedNet(object):
     ReLU nonlinearities, and a softmax loss function. This will also implement
     dropout and batch/layer normalization as options. For a network with L layers,
     the architecture will be
+
     {affine - [batch/layer norm] - relu - [dropout]} x (L - 1) - affine - softmax
+
     where batch/layer normalization and dropout are optional, and the {...} block is
     repeated L - 1 times.
+
     Similar to the TwoLayerNet above, learnable parameters are stored in the
     self.params dictionary and will be learned using the Solver class.
     """
@@ -116,6 +144,7 @@ class FullyConnectedNet(object):
                  weight_scale=1e-2, dtype=np.float32, seed=None):
         """
         Initialize a new FullyConnectedNet.
+
         Inputs:
         - hidden_dims: A list of integers giving the size of each hidden layer.
         - input_dim: An integer giving the size of the input.
@@ -153,7 +182,10 @@ class FullyConnectedNet(object):
         # beta2, etc. Scale parameters should be initialized to ones and shift     #
         # parameters should be initialized to zeros.                               #
         ############################################################################
-        pass
+        hidden_dims = [input_dim] + hidden_dims
+        for i in range(1,self.num_layers):
+            self.params['W'+str(i)] = np.random.normal(0,weight_scale,(hidden_dims[i-1],hidden_dims[i]))
+            self.params['b'+str(i)] = np.zeros(hidden_dims[i])
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -186,6 +218,7 @@ class FullyConnectedNet(object):
     def loss(self, X, y=None):
         """
         Compute loss and gradient for the fully-connected net.
+
         Input / output: Same as TwoLayerNet above.
         """
         X = X.astype(self.dtype)
@@ -211,7 +244,15 @@ class FullyConnectedNet(object):
         # self.bn_params[1] to the forward pass for the second batch normalization #
         # layer, etc.                                                              #
         ############################################################################
-        pass
+        Z = {}
+        Cache = {}
+        Z['z0']= X
+        for i in range(1,self.num_layers):
+            Z['z'+str(i)],Cache['cache_'+str(i)] = affine_relu_forward(Z['z'+str(i-1)],self.params['W'+str(i)],self.params['b'+str(i)])
+
+    
+        scores = Z['z'+str(self.num_layers-1)]
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -234,7 +275,18 @@ class FullyConnectedNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
-        pass
+        loss,dscores = softmax_loss(scores,y)
+        for i in range(1,self.num_layers):
+            loss += 0.5*self.reg*np.sum(self.params['W'+str(i)]*self.params['W'+str(i)])
+
+
+        dZ={}
+        dZ['z'+str(self.num_layers-1)] = dscores
+        for i in range(self.num_layers-1,0,-1):
+            dZ['z'+str(i-1)],grads['W'+str(i)],grads['b'+str(i)] = affine_relu_backward(dZ['z'+str(i)],Cache['cache_'+str(i)])
+            grads['W'+str(i)] += self.reg*(self.params['W'+str(i)])
+     
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
