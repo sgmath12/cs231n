@@ -11,13 +11,10 @@ class TwoLayerNet(object):
     A two-layer fully-connected neural network with ReLU nonlinearity and
     softmax loss that uses a modular layer design. We assume an input dimension
     of D, a hidden dimension of H, and perform classification over C classes.
-
     The architecure should be affine - relu - affine - softmax.
-
     Note that this class does not implement gradient descent; instead, it
     will interact with a separate Solver object that is responsible for running
     optimization.
-
     The learnable parameters of the model are stored in the dictionary
     self.params that maps parameter names to numpy arrays.
     """
@@ -26,7 +23,6 @@ class TwoLayerNet(object):
                  weight_scale=1e-3, reg=0.0):
         """
         Initialize a new network.
-
         Inputs:
         - input_dim: An integer giving the size of the input
         - hidden_dim: An integer giving the size of the hidden layer
@@ -47,7 +43,7 @@ class TwoLayerNet(object):
         # and biases using the keys 'W1' and 'b1' and second layer                 #
         # weights and biases using the keys 'W2' and 'b2'.                         #
         ############################################################################
-        pass
+        
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
@@ -56,16 +52,13 @@ class TwoLayerNet(object):
     def loss(self, X, y=None):
         """
         Compute loss and gradient for a minibatch of data.
-
         Inputs:
         - X: Array of input data of shape (N, d_1, ..., d_k)
         - y: Array of labels, of shape (N,). y[i] gives the label for X[i].
-
         Returns:
         If y is None, then run a test-time forward pass of the model and return:
         - scores: Array of shape (N, C) giving classification scores, where
           scores[i, c] is the classification score for X[i] and class c.
-
         If y is not None, then run a training-time forward and backward pass and
         return a tuple of:
         - loss: Scalar value giving the loss
@@ -111,12 +104,9 @@ class FullyConnectedNet(object):
     ReLU nonlinearities, and a softmax loss function. This will also implement
     dropout and batch/layer normalization as options. For a network with L layers,
     the architecture will be
-
     {affine - [batch/layer norm] - relu - [dropout]} x (L - 1) - affine - softmax
-
     where batch/layer normalization and dropout are optional, and the {...} block is
     repeated L - 1 times.
-
     Similar to the TwoLayerNet above, learnable parameters are stored in the
     self.params dictionary and will be learned using the Solver class.
     """
@@ -126,7 +116,6 @@ class FullyConnectedNet(object):
                  weight_scale=1e-2, dtype=np.float32, seed=None):
         """
         Initialize a new FullyConnectedNet.
-
         Inputs:
         - hidden_dims: A list of integers giving the size of each hidden layer.
         - input_dim: An integer giving the size of the input.
@@ -197,7 +186,6 @@ class FullyConnectedNet(object):
     def loss(self, X, y=None):
         """
         Compute loss and gradient for the fully-connected net.
-
         Input / output: Same as TwoLayerNet above.
         """
         X = X.astype(self.dtype)

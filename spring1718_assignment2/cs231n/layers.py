@@ -55,14 +55,15 @@ def affine_backward(dout, cache):
     """
     x, w, b = cache
     dx, dw, db = None, None, None
+    N = x.shape[0]
     ###########################################################################
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
 
 
-    dx = np.reshape(np.matmul(dout,np.transpose(w),x.shape))
-    dw = np.matmul(np.transpose(x),dout)
-    db = dout
+    dx = np.reshape(np.matmul(dout,w.T),x.shape) # (N,M)*(M,H) => (N,d, ... , d_k)
+    dw = np.matmul(x.reshape((N,-1)).T,dout) # (D,N)*(N,M)
+    db = np.matmul(np.ones((1,N)),dout).reshape(b.shape) # (1,N)*(N,M)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -84,7 +85,7 @@ def relu_forward(x):
     ###########################################################################
     # TODO: Implement the ReLU forward pass.                                  #
     ###########################################################################
-    out = np.max(0,x)
+    out = np.maximum(0,x)
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -691,7 +692,7 @@ def svm_loss(x, y):
     """
     N = x.shape[0]
     correct_class_scores = x[np.arange(N), y]
-    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0)
+    margins = np.maximum(0, x - correct_class_scores[:, np.newaxis] + 1.0) #delta = 1.0
     margins[np.arange(N), y] = 0
     loss = np.sum(margins) / N
     num_pos = np.sum(margins > 0, axis=1)
@@ -716,10 +717,10 @@ def softmax_loss(x, y):
     - loss: Scalar giving the loss
     - dx: Gradient of the loss with respect to x
     """
-    shifted_logits = x - np.max(x, axis=1, keepdims=True)
-    Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True)
-    log_probs = shifted_logits - np.log(Z)
-    probs = np.exp(log_probs)
+    shifted_logits = x - np.max(x, axis=1, keepdims=True) # since exp can be exploded, shift x.
+    Z = np.sum(np.exp(shifted_logits), axis=1, keepdims=True) #(N,1)
+    log_probs = shifted_logits - np.log(Z) # (N,C)
+    probs = np.exp(log_probs) #(N,C)
     N = x.shape[0]
     loss = -np.sum(log_probs[np.arange(N), y]) / N
     dx = probs.copy()
