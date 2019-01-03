@@ -164,7 +164,8 @@ class TwoLayerNet(object):
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
-    grads['W1'] = dW1
+    #pytorch grad
+    grads['W1'] = dW1 # (grads['W1'] += dW1) ?
     grads['b1'] = db1[0] # db1 = (1,H) 여서 (H,) 로 바꾸려고... 확인해봐야 할 듯
     grads['W2'] = dW2
     grads['b2'] = db2[0]
@@ -231,9 +232,9 @@ class TwoLayerNet(object):
       #2018/10/21
       #self.W = self.W - learning_rate*grad
       self.params['W1'] -= learning_rate*grads['W1']
-      self.params['b1'] = self.params['b1'] - learning_rate*grads['b1']
-      self.params['W2'] = self.params['W2'] - learning_rate*grads['W2']
-      self.params['b2'] = self.params['b2'] - learning_rate*grads['b2']
+      self.params['b1'] -= learning_rate*grads['b1']
+      self.params['W2'] -= learning_rate*grads['W2']
+      self.params['b2'] -= learning_rate*grads['b2']
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################

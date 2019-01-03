@@ -55,7 +55,10 @@ def sgd_momentum(w, dw, config=None):
     - velocity: A numpy array of the same shape as w and dw used to store a
       moving average of the gradients.
     """
-    if config is None: config = {}
+
+    
+    if config is None: 
+        config = {}
     config.setdefault('learning_rate', 1e-2)
     config.setdefault('momentum', 0.9)
     v = config.get('velocity', np.zeros_like(w))
@@ -65,11 +68,14 @@ def sgd_momentum(w, dw, config=None):
     # TODO: Implement the momentum update formula. Store the updated value in #
     # the next_w variable. You should also use and update the velocity v.     #
     ###########################################################################
-    pass
+    v = config['momentum']*v - config['learning_rate']*dw
+    next_w = w +v
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
     config['velocity'] = v
+
+    
 
     return next_w, config
 
@@ -99,7 +105,8 @@ def rmsprop(w, dw, config=None):
     # in the next_w variable. Don't forget to update cache value stored in    #
     # config['cache'].                                                        #
     ###########################################################################
-    pass
+    config['cache'] = config['decay_rate']*config['cache'] + (1 - config['decay_rate'])* dw**2
+    next_w = w - config['learning_rate']*dw/ (np.sqrt(config['cache']+ config['epsilon']))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -139,7 +146,9 @@ def adam(w, dw, config=None):
     # NOTE: In order to match the reference output, please modify t _before_  #
     # using it in any calculations.                                           #
     ###########################################################################
-    pass
+    config['m'] = config['beta1']*config['m'] + (1- config['beta1'])*dw
+    config['v'] = config['beta2']*config['v'] + (1-config['beta2'])*(dw**2)
+    next_w = w - learning_rate*config['m']/ (np.sqrt(config['v']+config['epsilon']))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
