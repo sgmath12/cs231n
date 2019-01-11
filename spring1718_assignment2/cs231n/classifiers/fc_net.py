@@ -259,7 +259,7 @@ class FullyConnectedNet(object):
         # layer, etc.                                                              #
         ############################################################################
 
-        Z,A,Cache_1,Cache_2,Cache_3 = dict(), dict(), dict(),dict(),dict()
+        Z,A,Cache_1,Cache_2,Cache_3,Cache_4 = dict(), dict(), dict(),dict(),dict(), dict()
 
         A[0]= X
         for i in range(1,self.num_layers):
@@ -273,6 +273,9 @@ class FullyConnectedNet(object):
                                                     self.bn_params[i-1]) 
 
             A[i], Cache_3[i] = relu_forward(Z[i])
+            
+            if self.use_dropout:
+                A[i] ,Cache_4[i] = dropout_forward(A[i],self.dropout_param)
     
         # final layer
         scores , out_cache = affine_forward(A[num_layers-1],
@@ -314,6 +317,8 @@ class FullyConnectedNet(object):
         dW[num_layers] += self.reg*self.params['W%d'%num_layers]
 
         for i in range(num_layers-1,0,-1):
+            if self.use_dropout:
+                dA[i] = dropout_backward(dA[i],Cache_4[i])
             dZ[i] = relu_backward(dA[i], Cache_3[i])
             if self.normalization == 'batchnorm':
                 dZ[i],dgamma[i],dbeta[i] = batchnorm_backward(dZ[i], Cache_2[i])

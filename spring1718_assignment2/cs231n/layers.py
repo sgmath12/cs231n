@@ -27,9 +27,8 @@ def affine_forward(x, w, b):
     # TODO: Implement the affine forward pass. Store the result in out. You   #
     # will need to reshape the input into rows.                               #
     ###########################################################################
-    x = x.reshape((N,-1))
-    out =x.dot(w) +b
-
+ 
+    out =np.matmul(x.reshape((N,-1)),w) + b
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -59,7 +58,7 @@ def affine_backward(dout, cache):
     ###########################################################################
     # TODO: Implement the affine backward pass.                               #
     ###########################################################################
-    dx = np.reshape(np.matmul(dout,w.T),x.shape)
+    dx = np.reshape(np.matmul(dout,w.T),x.shape).reshape(x.shape)
     dw = np.matmul(x.reshape((N,-1)).T,dout)
     db = np.matmul(np.ones((1,N)),dout).reshape(b.shape)
     ###########################################################################
@@ -475,7 +474,8 @@ def dropout_forward(x, dropout_param):
         # TODO: Implement training phase forward pass for inverted dropout.   #
         # Store the dropout mask in the mask variable.                        #
         #######################################################################
-        pass
+        mask = (np.random.rand(*x.shape)<p) / p 
+        out = x*mask
         #######################################################################
         #                           END OF YOUR CODE                          #
         #######################################################################
@@ -483,7 +483,7 @@ def dropout_forward(x, dropout_param):
         #######################################################################
         # TODO: Implement the test phase forward pass for inverted dropout.   #
         #######################################################################
-        pass
+        out = x
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
@@ -503,14 +503,14 @@ def dropout_backward(dout, cache):
     - cache: (dropout_param, mask) from dropout_forward.
     """
     dropout_param, mask = cache
-    mode = dropout_param['mode']
+    mode,p= dropout_param['mode'], dropout_param['p']
 
     dx = None
     if mode == 'train':
         #######################################################################
         # TODO: Implement training phase backward pass for inverted dropout   #
         #######################################################################
-        pass
+        dx = np.where(mask>0,dout,0)/p
         #######################################################################
         #                          END OF YOUR CODE                           #
         #######################################################################
